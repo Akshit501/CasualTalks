@@ -2,10 +2,15 @@ services:
   - type: web
     name: casualtalks-backend
     env: node
-    buildCommand: npm install
+    buildCommand: npm ci --production
     startCommand: node index.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
+    autoDeploy: true
+    scaling:
+      minInstances: 1
+      maxInstances: 1
+    healthCheckPath: /
