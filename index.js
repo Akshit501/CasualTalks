@@ -1,18 +1,32 @@
-const app=require("express")();
-
-const server=require("http").createServer(app);
-const cors=require('cors');
-const { sign } = require("crypto");
-const io=require("socket.io")(server, {
+require('dotenv').config();
+const express = require('express');
+const app = express();
+const server = require("http").createServer(app);
+const cors = require('cors');
+const io = require("socket.io")(server, {
   cors: {
-    origin: "*",
+    origin: process.env.NODE_ENV === 'production' 
+      ? process.env.FRONTEND_URL 
+      : "*",
     methods: ["GET", "POST"]
   }
 });
 
-app.use(cors());
+// Middleware
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production'
+    ? process.env.FRONTEND_URL
+    : "*"
+}));
+app.use(express.json());
 
-const PORT=process.env.PORT || 5000;
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+const PORT = process.env.PORT || 5000;
 
 app.get('/',(req,res)=>{
   res.send("Server is running");
